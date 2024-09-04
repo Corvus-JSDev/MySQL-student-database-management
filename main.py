@@ -64,13 +64,23 @@ class MainWindow(QMainWindow):
 
 
 	def cell_clicked(self):
+		# Create buttons
 		edit_btn = QPushButton("Edit")
 		edit_btn.clicked.connect(self.edit_dialog)
-		self.statusbar.addWidget(edit_btn)
-
 		delete_record_btn = QPushButton("Delete")
 		delete_record_btn.clicked.connect(self.delete_dialog)
+
+		# Clear the statusbar
+		children = self.findChildren(QPushButton)
+		if children:
+			for child in children:
+				self.statusbar.removeWidget(child)
+
+		# Add the widgets
+		self.statusbar.addWidget(edit_btn)
 		self.statusbar.addWidget(delete_record_btn)
+
+
 
 
 	def load_data(self):
