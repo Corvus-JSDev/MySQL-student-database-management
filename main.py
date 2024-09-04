@@ -30,14 +30,14 @@ class MainWindow(QMainWindow):
 
 		# Add sub-menu items
 		add_student_subitem = QAction(QIcon("./icons/add.png"), "Add Student", self)
-		add_student_subitem.triggered.connect(InsertDialog().exec)
+		add_student_subitem.triggered.connect(self.add_student)
 		file_menu_item.addAction(add_student_subitem)
 
 		about_subitem = QAction("About", self)
 		help_menu_item.addAction(about_subitem)
 
 		search_subitem = QAction(QIcon("./icons/search.png"), "Search", self)
-		search_subitem.triggered.connect(SearchDialog().exec)
+		search_subitem.triggered.connect(self.search_students)
 		edit_menu_item.addAction(search_subitem)
 
 		# Add table
@@ -64,14 +64,13 @@ class MainWindow(QMainWindow):
 
 
 	def cell_clicked(self):
-		edit_btn = QPushButton("Edit Record")
-		edit_btn.clicked.connect(EditDialog().exec)
+		edit_btn = QPushButton("Edit")
+		edit_btn.clicked.connect(self.edit_dialog)
 		self.statusbar.addWidget(edit_btn)
 
-		delete_record_btn = QPushButton("Edit Record")
-		delete_record_btn.clicked.connect(DeleteDialog().exec)
+		delete_record_btn = QPushButton("Delete")
+		delete_record_btn.clicked.connect(self.delete_dialog)
 		self.statusbar.addWidget(delete_record_btn)
-
 
 
 	def load_data(self):
@@ -88,11 +87,25 @@ class MainWindow(QMainWindow):
 					table.setItem(index_row, index_column, QTableWidgetItem(str(data)))
 
 
+	def add_student(self):
+		InsertDialog().exec()
+
+
+	def search_students(self):
+		StudentDialog().exec()
+
+
+	def edit_dialog(self):
+		EditDialog().exec()
+
+
+	def delete_dialog(self):
+		DeleteDialog().exec()
 
 class EditDialog(QDialog):
 	def __init__(self):
 		super().__init__()
-		self.setWindowTitle("Search For Student")
+		self.setWindowTitle("Edit Student")
 		grid = QVBoxLayout()
 		width, height = 500, 300
 		self.resize(width, height)
@@ -105,17 +118,13 @@ class EditDialog(QDialog):
 class DeleteDialog(QDialog):
 	def __init__(self):
 		super().__init__()
-		self.setWindowTitle("Search For Student")
+		self.setWindowTitle("Delete Student")
 		grid = QVBoxLayout()
 		width, height = 500, 300
 		self.resize(width, height)
 
 
-
-		self.setLayout(grid)
-
-
-class SearchDialog(QDialog):
+class StudentDialog(QDialog):
 	def __init__(self):
 		super().__init__()
 		self.setWindowTitle("Search For Student")
@@ -192,6 +201,7 @@ class InsertDialog(QDialog):
 
 			self.output_msg.setText(f"{name} has been added as a student")
 			main_window.load_data()
+
 
 
 if __name__ == "__main__":
