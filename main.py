@@ -165,7 +165,8 @@ class EditDialog(QDialog):
 					   (name, course, contact, student_id))
 			connection.commit()
 
-			self.output_msg.setText("Update Successful")
+		self.output_msg.setText("Update Successful")
+		main_window.load_data()
 
 
 class DeleteDialog(QDialog):
@@ -251,8 +252,8 @@ class InsertDialog(QDialog):
 					   (name, course, contact))
 			connection.commit()
 
-			self.output_msg.setText(f"{name} has been added as a student")
-			main_window.load_data()
+		self.output_msg.setText(f"{name} has been added as a student")
+		main_window.load_data()
 
 
 
