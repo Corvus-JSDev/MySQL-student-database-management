@@ -102,7 +102,6 @@ class EditDialog(QDialog):
 		self.setLayout(grid)
 
 
-
 class DeleteDialog(QDialog):
 	def __init__(self):
 		super().__init__()
@@ -114,7 +113,6 @@ class DeleteDialog(QDialog):
 
 
 		self.setLayout(grid)
-
 
 
 class SearchDialog(QDialog):
@@ -139,7 +137,6 @@ class SearchDialog(QDialog):
 		grid.addWidget(submit_btn)
 
 		self.setLayout(grid)
-
 
 
 class InsertDialog(QDialog):
@@ -197,9 +194,9 @@ class InsertDialog(QDialog):
 			main_window.load_data()
 
 
-
-app = QApplication(sys.argv)
-main_window = MainWindow()
-main_window.show()
-main_window.load_data()
-sys.exit(app.exec())
+if __name__ == "__main__":
+	app = QApplication(sys.argv)
+	main_window = MainWindow()
+	main_window.show()
+	main_window.load_data()
+	sys.exit(app.exec())
