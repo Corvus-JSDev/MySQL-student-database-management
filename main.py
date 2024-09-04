@@ -30,14 +30,14 @@ class MainWindow(QMainWindow):
 
 		# Add sub-menu items
 		add_student_subitem = QAction(QIcon("./icons/add.png"), "Add Student", self)
-		add_student_subitem.triggered.connect(self.add_student)
+		add_student_subitem.triggered.connect(self.add_student_dialog)
 		file_menu_item.addAction(add_student_subitem)
 
 		about_subitem = QAction("About", self)
 		help_menu_item.addAction(about_subitem)
 
 		search_subitem = QAction(QIcon("./icons/search.png"), "Search", self)
-		search_subitem.triggered.connect(self.search_students)
+		search_subitem.triggered.connect(self.search_dialog)
 		edit_menu_item.addAction(search_subitem)
 
 		# Add table
@@ -87,17 +87,14 @@ class MainWindow(QMainWindow):
 					table.setItem(index_row, index_column, QTableWidgetItem(str(data)))
 
 
-	def add_student(self):
+	def add_student_dialog(self):
 		InsertDialog().exec()
 
-
-	def search_students(self):
+	def search_dialog(self):
 		StudentDialog().exec()
-
 
 	def edit_dialog(self):
 		EditDialog().exec()
-
 
 	def delete_dialog(self):
 		DeleteDialog().exec()
