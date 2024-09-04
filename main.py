@@ -1,7 +1,9 @@
-from PyQt6.QtWidgets import QApplication, QVBoxLayout, QLabel, QWidget, QLineEdit, QPushButton, QMainWindow, QTableWidget
+from PyQt6.QtWidgets import QApplication, QVBoxLayout, QLabel, QWidget, QLineEdit, QPushButton, QMainWindow, QTableWidget, QTableWidgetItem
 from PyQt6.QtGui import QAction
 import sys
 import sqlite3
+from pprint import pp
+from contextlib import contextmanager
 
 class MainWindow(QMainWindow):
 	def __init__(self):
@@ -24,13 +26,32 @@ class MainWindow(QMainWindow):
 		self.table = QTableWidget()
 		self.table.setColumnCount(4)
 		self.table.setHorizontalHeaderLabels(("ID", "Name", "Course", "Contact"))
+		self.table.verticalHeader().setVisible(False)  # Hide the index column on the left
 		self.setCentralWidget(self.table)
 
 
+	@contextmanager
+	def connect_to_database(self, database):
+		connection = sqlite3.connect(database)
+		try:
+			yield connection
+		finally:
+			connection.close()
+
 	def load_data(self):
-		tabel = self.table
-		connection = sqlite3.connect("database.db")
-		result = connection.execute("SELECT * FROM students")
+		with self.connect_to_database("database.db") as connection:
+			result = connection.execute("SELECT * FROM students")
+
+			table = self.table
+			table.setRowCount(0)  # Reset the table to prevent duplicate data
+			for index_row, row_data in enumerate(result):
+				table.insertRow(index_row)  # Create the row that the data will go into
+
+				for index_column, data in enumerate(row_data):
+					# Insert data at these coordinates
+					table.setItem(index_row, index_column, QTableWidgetItem(str(data)))
+
+
 
 
 app = QApplication(sys.argv)
