@@ -5,7 +5,11 @@ import sys
 class MainWindow(QMainWindow):
 	def __init__(self):
 		super().__init__()
+
+		# Set window values
 		self.setWindowTitle("Student Management System")
+		width, height = 750, 500
+		self.resize(width, height)
 
 		# Add menu items
 		file_menu_item = self.menuBar().addMenu("&File")
