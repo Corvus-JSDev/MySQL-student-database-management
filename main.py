@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QApplication, QVBoxLayout, QLabel, QWidget, QLineEdit, QPushButton, QMainWindow, QTableWidget, QTableWidgetItem, QDialog, QComboBox, QToolBar
-from PyQt6.QtGui import QAction
+from PyQt6.QtGui import QAction, QIcon
 import sys
 import sqlite3
 from pprint import pp
@@ -28,14 +28,14 @@ class MainWindow(QMainWindow):
 		edit_menu_item = self.menuBar().addMenu("&Edit")
 
 		# Add sub-menu items
-		add_student_subitem = QAction("Add Student", self)
+		add_student_subitem = QAction(QIcon("./icons/add.png"), "Add Student", self)
 		add_student_subitem.triggered.connect(self.add_student)
 		file_menu_item.addAction(add_student_subitem)
 
 		about_subitem = QAction("About", self)
 		help_menu_item.addAction(about_subitem)
 
-		search_subitem = QAction("Search", self)
+		search_subitem = QAction(QIcon("./icons/search.png"), "Search", self)
 		search_subitem.triggered.connect(self.search_students)
 		edit_menu_item.addAction(search_subitem)
 
