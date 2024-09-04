@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import QApplication, QVBoxLayout, QLabel, QWidget, QLineEdit, QPushButton, QMainWindow, QTableWidget
 from PyQt6.QtGui import QAction
 import sys
+import sqlite3
 
 class MainWindow(QMainWindow):
 	def __init__(self):
@@ -28,10 +29,12 @@ class MainWindow(QMainWindow):
 
 	def load_data(self):
 		tabel = self.table
-		pass
+		connection = sqlite3.connect("database.db")
+		result = connection.execute("SELECT * FROM students")
 
 
 app = QApplication(sys.argv)
 main_window = MainWindow()
 main_window.show()
+main_window.load_data()
 sys.exit(app.exec())
