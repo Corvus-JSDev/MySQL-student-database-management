@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QApplication, QVBoxLayout, QLabel, QWidget, QLineEdit, QPushButton, QMainWindow, QTableWidget, QTableWidgetItem, QDialog, QComboBox, QToolBar
+from PyQt6.QtWidgets import QApplication, QVBoxLayout, QLabel, QWidget, QLineEdit, QPushButton, QMainWindow, QTableWidget, QTableWidgetItem, QDialog, QComboBox, QToolBar, QStatusBar
 from PyQt6.QtGui import QAction, QIcon
 import sys
 import sqlite3
@@ -30,14 +30,14 @@ class MainWindow(QMainWindow):
 
 		# Add sub-menu items
 		add_student_subitem = QAction(QIcon("./icons/add.png"), "Add Student", self)
-		add_student_subitem.triggered.connect(self.add_student)
+		add_student_subitem.triggered.connect(InsertDialog().exec())
 		file_menu_item.addAction(add_student_subitem)
 
 		about_subitem = QAction("About", self)
 		help_menu_item.addAction(about_subitem)
 
 		search_subitem = QAction(QIcon("./icons/search.png"), "Search", self)
-		search_subitem.triggered.connect(self.search_students)
+		search_subitem.triggered.connect(SearchDialog().exec())
 		edit_menu_item.addAction(search_subitem)
 
 		# Add table
@@ -51,8 +51,27 @@ class MainWindow(QMainWindow):
 		toolbar = QToolBar()
 		toolbar.setMovable(True)
 		self.addToolBar(toolbar)
+
 		toolbar.addAction(add_student_subitem)
 		toolbar.addAction(search_subitem)
+
+		# Create status bar
+		self.statusbar = QStatusBar()
+		self.setStatusBar(self.statusbar)
+
+		# Detect a cell click
+		self.table.cellClicked.connect(self.cell_clicked)
+
+
+	def cell_clicked(self):
+		edit_btn = QPushButton("Edit Record")
+		edit_btn.clicked.connect(EditDialog().exec())
+		self.statusbar.addWidget(edit_btn)
+
+		delete_record_btn = QPushButton("Edit Record")
+		delete_record_btn.clicked.connect(DeleteDialog().exec())
+		self.statusbar.addWidget(delete_record_btn)
+
 
 
 	def load_data(self):
@@ -69,16 +88,36 @@ class MainWindow(QMainWindow):
 					table.setItem(index_row, index_column, QTableWidgetItem(str(data)))
 
 
-	def add_student(self):
-		InsertDialog().exec()
+
+class EditDialog(QDialog):
+	def __init__(self):
+		super().__init__()
+		self.setWindowTitle("Search For Student")
+		grid = QVBoxLayout()
+		width, height = 500, 300
+		self.resize(width, height)
 
 
-	def search_students(self):
-		StudentSearch().exec()
+
+		self.setLayout(grid)
 
 
 
-class StudentSearch(QDialog):
+class DeleteDialog(QDialog):
+	def __init__(self):
+		super().__init__()
+		self.setWindowTitle("Search For Student")
+		grid = QVBoxLayout()
+		width, height = 500, 300
+		self.resize(width, height)
+
+
+
+		self.setLayout(grid)
+
+
+
+class SearchDialog(QDialog):
 	def __init__(self):
 		super().__init__()
 		self.setWindowTitle("Search For Student")
