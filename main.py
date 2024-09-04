@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QApplication, QVBoxLayout, QLabel, QWidget, QLineEdit, QPushButton, QMainWindow, QTableWidget, QTableWidgetItem, QDialog, QComboBox
+from PyQt6.QtWidgets import QApplication, QVBoxLayout, QLabel, QWidget, QLineEdit, QPushButton, QMainWindow, QTableWidget, QTableWidgetItem, QDialog, QComboBox, QToolBar
 from PyQt6.QtGui import QAction
 import sys
 import sqlite3
@@ -46,6 +46,13 @@ class MainWindow(QMainWindow):
 		self.table.verticalHeader().setVisible(False)  # Hide the index column on the left
 		self.setCentralWidget(self.table)
 
+		# Create toolbar
+		toolbar = QToolBar()
+		toolbar.setMovable(True)
+		self.addToolBar(toolbar)
+		toolbar.addAction(add_student_subitem)
+		toolbar.addAction(search_subitem)
+
 
 	def load_data(self):
 		with connect_to_database("database.db") as connection:
@@ -84,6 +91,7 @@ class StudentSearch(QDialog):
 		search_input.setPlaceholderText("John Smith")
 
 		submit_btn = QPushButton("Search")
+		# submit_btn.clicked.connect(self.submit_search)
 
 		# Place Widgets
 		grid.addWidget(search_label)
