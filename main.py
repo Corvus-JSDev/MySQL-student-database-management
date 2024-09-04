@@ -1,9 +1,17 @@
-from PyQt6.QtWidgets import QApplication, QVBoxLayout, QLabel, QWidget, QLineEdit, QPushButton, QMainWindow, QTableWidget, QTableWidgetItem
+from PyQt6.QtWidgets import QApplication, QVBoxLayout, QLabel, QWidget, QLineEdit, QPushButton, QMainWindow, QTableWidget, QTableWidgetItem, QDialog, QComboBox
 from PyQt6.QtGui import QAction
 import sys
 import sqlite3
 from pprint import pp
 from contextlib import contextmanager
+
+@contextmanager
+def connect_to_database(database="database.db"):
+	connection = sqlite3.connect(database)
+	try:
+		yield connection
+	finally:
+		connection.close()
 
 class MainWindow(QMainWindow):
 	def __init__(self):
@@ -19,8 +27,11 @@ class MainWindow(QMainWindow):
 		help_menu_item = self.menuBar().addMenu("&Help")
 
 		# Add sub-menu items
-		file_menu_item.addAction(QAction("Add Student", self))
-		help_menu_item.addAction(QAction("About", self))
+		add_student_subitem = QAction("Add Student", self)
+		add_student_subitem.triggered.connect(self.add_student)
+		about_subitem = QAction("About", self)
+		file_menu_item.addAction(add_student_subitem)
+		help_menu_item.addAction(about_subitem)
 
 		# Add table
 		self.table = QTableWidget()
@@ -30,16 +41,8 @@ class MainWindow(QMainWindow):
 		self.setCentralWidget(self.table)
 
 
-	@contextmanager
-	def connect_to_database(self, database):
-		connection = sqlite3.connect(database)
-		try:
-			yield connection
-		finally:
-			connection.close()
-
 	def load_data(self):
-		with self.connect_to_database("database.db") as connection:
+		with connect_to_database("database.db") as connection:
 			result = connection.execute("SELECT * FROM students")
 
 			table = self.table
@@ -51,6 +54,66 @@ class MainWindow(QMainWindow):
 					# Insert data at these coordinates
 					table.setItem(index_row, index_column, QTableWidgetItem(str(data)))
 
+
+	def add_student(self):
+		dialog = InsertDialog()
+		dialog.exec()
+
+
+
+class InsertDialog(QDialog):
+	def __init__(self):
+		super().__init__()
+		self.setWindowTitle("Add Student")
+		grid = QVBoxLayout()
+		width, height = 500, 300
+		self.resize(width, height)
+
+		# Create widgets
+		name_label = QLabel("Student\'s Name")
+		self.name_input = QLineEdit()
+		self.name_input.setPlaceholderText("John Smith")
+
+		course_label = QLabel("Student\'s Course")
+		self.course_input = QComboBox()
+		self.course_input.addItems(["Biology", "Math", "Astronomy", "Physics", "English"])
+
+		contact_label = QLabel("Student\'s Contact Info")
+		self.contact_input = QLineEdit()
+		self.contact_input.setPlaceholderText("John.Smith@school.com")
+
+		submit_btn = QPushButton("Add Student")
+		submit_btn.clicked.connect(self.register_student)
+		self.output_msg = QLabel("")
+
+		# Place widgets
+		grid.addWidget(name_label)
+		grid.addWidget(self.name_input)
+		grid.addWidget(course_label)
+		grid.addWidget(self.course_input)
+		grid.addWidget(contact_label)
+		grid.addWidget(self.contact_input)
+		grid.addWidget(submit_btn)
+		grid.addWidget(self.output_msg)
+
+
+		self.setLayout(grid)
+
+
+	def register_student(self):
+		with connect_to_database("database.db") as connection:
+			name = self.name_input.text().title()
+			course = self.course_input.itemText(self.course_input.currentIndex())
+			contact = self.contact_input.text()
+
+			cursor = connection.cursor()
+			# The ID for the student is added automatically by the database
+			cursor.execute("INSERT INTO students (name, course, mobile) VALUES (?, ?, ?)",
+					   (name, course, contact))
+			connection.commit()
+
+			self.output_msg.setText(f"{name} has been added as a student")
+			main_window.load_data()
 
 
 
