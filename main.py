@@ -36,6 +36,7 @@ class MainWindow(QMainWindow):
 		help_menu_item.addAction(about_subitem)
 
 		search_subitem = QAction("Search", self)
+		search_subitem.triggered.connect(self.search_students)
 		edit_menu_item.addAction(search_subitem)
 
 		# Add table
@@ -61,8 +62,35 @@ class MainWindow(QMainWindow):
 
 
 	def add_student(self):
-		dialog = InsertDialog()
-		dialog.exec()
+		InsertDialog().exec()
+
+
+	def search_students(self):
+		StudentSearch().exec()
+
+
+
+class StudentSearch(QDialog):
+	def __init__(self):
+		super().__init__()
+		self.setWindowTitle("Search For Student")
+		grid = QVBoxLayout()
+		width, height = 500, 300
+		self.resize(width, height)
+
+		# Create Widgets
+		search_label = QLabel("Search by name")
+		search_input = QLineEdit()
+		search_input.setPlaceholderText("John Smith")
+
+		submit_btn = QPushButton("Search")
+
+		# Place Widgets
+		grid.addWidget(search_label)
+		grid.addWidget(search_input)
+		grid.addWidget(submit_btn)
+
+		self.setLayout(grid)
 
 
 
