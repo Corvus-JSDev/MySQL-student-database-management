@@ -30,14 +30,14 @@ class MainWindow(QMainWindow):
 
 		# Add sub-menu items
 		add_student_subitem = QAction(QIcon("./icons/add.png"), "Add Student", self)
-		add_student_subitem.triggered.connect(InsertDialog().exec())
+		add_student_subitem.triggered.connect(InsertDialog().exec)
 		file_menu_item.addAction(add_student_subitem)
 
 		about_subitem = QAction("About", self)
 		help_menu_item.addAction(about_subitem)
 
 		search_subitem = QAction(QIcon("./icons/search.png"), "Search", self)
-		search_subitem.triggered.connect(SearchDialog().exec())
+		search_subitem.triggered.connect(SearchDialog().exec)
 		edit_menu_item.addAction(search_subitem)
 
 		# Add table
@@ -65,11 +65,11 @@ class MainWindow(QMainWindow):
 
 	def cell_clicked(self):
 		edit_btn = QPushButton("Edit Record")
-		edit_btn.clicked.connect(EditDialog().exec())
+		edit_btn.clicked.connect(EditDialog().exec)
 		self.statusbar.addWidget(edit_btn)
 
 		delete_record_btn = QPushButton("Edit Record")
-		delete_record_btn.clicked.connect(DeleteDialog().exec())
+		delete_record_btn.clicked.connect(DeleteDialog().exec)
 		self.statusbar.addWidget(delete_record_btn)
 
 
