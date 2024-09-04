@@ -112,14 +112,60 @@ class MainWindow(QMainWindow):
 class EditDialog(QDialog):
 	def __init__(self):
 		super().__init__()
-		self.setWindowTitle("Edit Student")
+		self.setWindowTitle("Edit Student Data")
 		grid = QVBoxLayout()
 		width, height = 500, 300
 		self.resize(width, height)
 
+		row_index = main_window.table.currentRow()
+		#                        coordinates: row, column index
+		self.student_id = main_window.table.item(row_index, 0).text()
+		student_name = main_window.table.item(row_index, 1).text()
+		course_name = main_window.table.item(row_index, 2).text()
+		student_contact = main_window.table.item(row_index, 3).text()
 
+		# Create widgets
+		name_label = QLabel("Student\'s Name")
+		self.name_input = QLineEdit(student_name)
+
+		course_label = QLabel("Student\'s Course")
+		self.course_input = QComboBox()
+		self.course_input.addItems(["Biology", "Math", "Astronomy", "Physics", "English"])
+		self.course_input.setCurrentText(course_name)
+
+		contact_label = QLabel("Student\'s Contact Info")
+		self.contact_input = QLineEdit(student_contact)
+
+		submit_btn = QPushButton("Update")
+		submit_btn.clicked.connect(self.update_data)
+		self.output_msg = QLabel("")
+
+		# Place widgets
+		grid.addWidget(name_label)
+		grid.addWidget(self.name_input)
+		grid.addWidget(course_label)
+		grid.addWidget(self.course_input)
+		grid.addWidget(contact_label)
+		grid.addWidget(self.contact_input)
+		grid.addWidget(submit_btn)
+		grid.addWidget(self.output_msg)
 
 		self.setLayout(grid)
+
+
+	def update_data(self):
+		name = self.name_input.text()
+		course = self.course_input.text()
+		contact = self.contact_input.text()
+		student_id = self.student_id
+
+		with connect_to_database("database.db") as connection:
+			cursor = connection.cursor()
+			cursor.execute("UPDATE students SET name = ?, course = ?, mobile = ? WHERE id = ?",
+					   (name, course, contact, student_id))
+			connection.commit()
+
+			self.output_msg.setText("Update Successful")
 
 
 class DeleteDialog(QDialog):
@@ -189,7 +235,6 @@ class InsertDialog(QDialog):
 		grid.addWidget(self.contact_input)
 		grid.addWidget(submit_btn)
 		grid.addWidget(self.output_msg)
-
 
 		self.setLayout(grid)
 
