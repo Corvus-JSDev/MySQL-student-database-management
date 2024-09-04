@@ -25,13 +25,18 @@ class MainWindow(QMainWindow):
 		# Add menu items
 		file_menu_item = self.menuBar().addMenu("&File")
 		help_menu_item = self.menuBar().addMenu("&Help")
+		edit_menu_item = self.menuBar().addMenu("&Edit")
 
 		# Add sub-menu items
 		add_student_subitem = QAction("Add Student", self)
 		add_student_subitem.triggered.connect(self.add_student)
-		about_subitem = QAction("About", self)
 		file_menu_item.addAction(add_student_subitem)
+
+		about_subitem = QAction("About", self)
 		help_menu_item.addAction(about_subitem)
+
+		search_subitem = QAction("Search", self)
+		edit_menu_item.addAction(search_subitem)
 
 		# Add table
 		self.table = QTableWidget()
