@@ -101,7 +101,7 @@ class MainWindow(QMainWindow):
 		InsertDialog().exec()
 
 	def search_dialog(self):
-		StudentDialog().exec()
+		SearchDialog().exec()
 
 	def edit_dialog(self):
 		EditDialog().exec()
@@ -155,7 +155,7 @@ class EditDialog(QDialog):
 
 	def update_data(self):
 		name = self.name_input.text()
-		course = self.course_input.text()
+		course = self.course_input.itemText(self.course_input.currentIndex())
 		contact = self.contact_input.text()
 		student_id = self.student_id
 
@@ -178,7 +178,7 @@ class DeleteDialog(QDialog):
 		self.resize(width, height)
 
 
-class StudentDialog(QDialog):
+class SearchDialog(QDialog):
 	def __init__(self):
 		super().__init__()
 		self.setWindowTitle("Search For Student")
