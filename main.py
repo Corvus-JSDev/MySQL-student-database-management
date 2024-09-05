@@ -1,9 +1,11 @@
-from PyQt6.QtWidgets import QApplication, QVBoxLayout, QLabel, QWidget, QLineEdit, QPushButton, QMainWindow, QTableWidget, QTableWidgetItem, QDialog, QComboBox, QToolBar, QStatusBar, QGridLayout, QMessageBox
-from PyQt6.QtGui import QAction, QIcon
-import sys
 import sqlite3
-from pprint import pp
+import sys
 from contextlib import contextmanager
+
+from PyQt6.QtGui import QAction, QIcon
+from PyQt6.QtWidgets import QApplication, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMainWindow, QTableWidget, \
+	QTableWidgetItem, QDialog, QComboBox, QToolBar, QStatusBar, QGridLayout, QMessageBox
+
 
 @contextmanager
 def connect_to_database():
