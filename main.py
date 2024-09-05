@@ -1,4 +1,5 @@
-import sqlite3
+from PyQt6.QtCore import Qt
+import mysql.connector
 import sys
 from contextlib import contextmanager
 
@@ -6,15 +7,25 @@ from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtWidgets import QApplication, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMainWindow, QTableWidget, \
 	QTableWidgetItem, QDialog, QComboBox, QToolBar, QStatusBar, QGridLayout, QMessageBox
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+SQL_USER = os.getenv("SQL_USER")
+SQL_PASS = os.getenv("SQL_PASS")
+SQL_URL = os.getenv("SQL_URL")
+SQL_TABLE = os.getenv("SQL_TABLE")
+
 
 @contextmanager
 def connect_to_database():
-	connection = sqlite3.connect("database.db")
+	connection = mysql.connector.connect(host=SQL_URL, user=SQL_USER, password=SQL_PASS, database=SQL_TABLE)
+
 	try:
 		yield connection
 	finally:
-		connection.close()
-
+		if connection.is_connected():
+			connection.close()
 
 
 class MainWindow(QMainWindow):
@@ -88,7 +99,9 @@ class MainWindow(QMainWindow):
 
 	def load_data(self):
 		with connect_to_database() as connection:
-			result = connection.execute("SELECT * FROM students")
+			cursor = connection.cursor()
+			cursor.execute("SELECT * FROM students")
+			result = cursor.fetchall()
 
 			table = self.table
 			table.setRowCount(0)  # Reset the table to prevent duplicate data
@@ -184,7 +197,7 @@ class EditDialog(QDialog):
 
 		with connect_to_database() as connection:
 			cursor = connection.cursor()
-			cursor.execute("UPDATE students SET name = ?, course = ?, mobile = ? WHERE id = ?",
+			cursor.execute("UPDATE students SET name = %s, course = %s, contact = %s WHERE id = %s",
 					   (name, course, contact, student_id))
 			connection.commit()
 
@@ -219,7 +232,7 @@ class DeleteDialog(QDialog):
 	def delete_student(self):
 		with connect_to_database() as connection:
 			cursor = connection.cursor()
-			cursor.execute("DELETE FROM students WHERE id = ?", (self.student_id, ))
+			cursor.execute("DELETE FROM students WHERE id = %s", (self.student_id, ))
 			connection.commit()
 
 		main_window.load_data()
@@ -235,25 +248,43 @@ class DeleteDialog(QDialog):
 class SearchDialog(QDialog):
 	def __init__(self):
 		super().__init__()
-		self.setWindowTitle("Search For Student")
-		grid = QVBoxLayout()
-		width, height = 500, 300
-		self.resize(width, height)
+		# Set window title and size
+		self.setWindowTitle("Search Student")
+		self.resize(300, 200)
 
-		# Create Widgets
-		search_label = QLabel("Search by name")
-		search_input = QLineEdit()
-		search_input.setPlaceholderText("John Smith")
+		# Create layout and input widget
+		layout = QVBoxLayout()
+		search_label = QLabel("Search Student\n(First-name Last-Name)")
+		layout.addWidget(search_label)
+		self.student_name = QLineEdit()
+		self.student_name.setPlaceholderText("Name")
+		layout.addWidget(self.student_name)
+		self.output_msg = QLabel("")
+		layout.addWidget(self.output_msg)
 
-		submit_btn = QPushButton("Search")
-		# submit_btn.clicked.connect(self.submit_search)
+		# Create button
+		button = QPushButton("Search")
+		button.clicked.connect(self.search)
+		layout.addWidget(button)
 
-		# Place Widgets
-		grid.addWidget(search_label)
-		grid.addWidget(search_input)
-		grid.addWidget(submit_btn)
+		self.setLayout(layout)
 
-		self.setLayout(grid)
+	def search(self):
+		name = self.student_name.text().title()
+
+		with connect_to_database() as connection:
+			cursor = connection.cursor()
+			cursor.execute("SELECT * FROM students WHERE name = %s", (name,))
+
+			result = cursor.fetchall()
+			if result:
+				self.output_msg.setText("Success, Student Found!")
+			else:
+				self.output_msg.setText("NO student found")
+
+			items = main_window.table.findItems(name, Qt.MatchFlag.MatchFixedString)
+			for item in items:
+				main_window.table.item(item.row(), 1).setSelected(True)
 
 
 class AddStudentDialog(QDialog):
@@ -302,7 +333,7 @@ class AddStudentDialog(QDialog):
 
 			cursor = connection.cursor()
 			# The ID for the student is added automatically by the database
-			cursor.execute("INSERT INTO students (name, course, mobile) VALUES (?, ?, ?)",
+			cursor.execute("INSERT INTO students (name, course, contact) VALUES (%s, %s, %s)",
 					   (name, course, contact))
 			connection.commit()
 
