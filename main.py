@@ -130,7 +130,6 @@ https://github.com/Corvus-JSDev/student-database-management"""
 		self.setText(message)
 
 
-
 class EditDialog(QDialog):
 	def __init__(self):
 		super().__init__()
