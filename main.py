@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QApplication, QVBoxLayout, QLabel, QWidget, QLineEdit, QPushButton, QMainWindow, QTableWidget, QTableWidgetItem, QDialog, QComboBox, QToolBar, QStatusBar
+from PyQt6.QtWidgets import QApplication, QVBoxLayout, QLabel, QWidget, QLineEdit, QPushButton, QMainWindow, QTableWidget, QTableWidgetItem, QDialog, QComboBox, QToolBar, QStatusBar, QGridLayout, QMessageBox
 from PyQt6.QtGui import QAction, QIcon
 import sys
 import sqlite3
@@ -109,6 +109,8 @@ class MainWindow(QMainWindow):
 	def delete_dialog(self):
 		DeleteDialog().exec()
 
+
+
 class EditDialog(QDialog):
 	def __init__(self):
 		super().__init__()
@@ -173,9 +175,40 @@ class DeleteDialog(QDialog):
 	def __init__(self):
 		super().__init__()
 		self.setWindowTitle("Delete Student")
-		grid = QVBoxLayout()
-		width, height = 500, 300
+		grid = QGridLayout()
+		width, height = 300, 150
 		self.resize(width, height)
+
+		self.row_index = main_window.table.currentRow()
+		self.student_name = main_window.table.item(self.row_index, 1).text()
+		self.student_id = main_window.table.item(self.row_index, 0).text()
+
+		confirm_msg = QLabel(f"Are you sure you want to delete all of {self.student_name}\'s information?")
+		cancel_btn = QPushButton("Cancel")
+		cancel_btn.clicked.connect(self.close)
+		delete_btn = QPushButton("Delete")
+		delete_btn.clicked.connect(self.delete_student)
+
+		grid.addWidget(confirm_msg, 0, 0, 1, 2)
+		grid.addWidget(cancel_btn, 1, 1)
+		grid.addWidget(delete_btn, 1, 0)
+		self.setLayout(grid)
+
+
+	def delete_student(self):
+		with connect_to_database("database.db") as connection:
+			cursor = connection.cursor()
+			cursor.execute("DELETE FROM students WHERE id = ?", (self.student_id, ))
+			connection.commit()
+
+		main_window.load_data()
+		self.close()
+
+		# Confirmation window
+		confirm_widget = QMessageBox()
+		confirm_widget.setWindowTitle("Student Deleted")
+		confirm_widget.setText(f"{self.student_name} has been successfully deleted")
+		confirm_widget.exec()
 
 
 class SearchDialog(QDialog):
