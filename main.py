@@ -6,12 +6,14 @@ from pprint import pp
 from contextlib import contextmanager
 
 @contextmanager
-def connect_to_database(database="database.db"):
-	connection = sqlite3.connect(database)
+def connect_to_database():
+	connection = sqlite3.connect("database.db")
 	try:
 		yield connection
 	finally:
 		connection.close()
+
+
 
 class MainWindow(QMainWindow):
 	def __init__(self):
@@ -82,10 +84,8 @@ class MainWindow(QMainWindow):
 		self.statusbar.addWidget(delete_record_btn)
 
 
-
-
 	def load_data(self):
-		with connect_to_database("database.db") as connection:
+		with connect_to_database() as connection:
 			result = connection.execute("SELECT * FROM students")
 
 			table = self.table
@@ -99,7 +99,7 @@ class MainWindow(QMainWindow):
 
 
 	def add_student_dialog(self):
-		InsertDialog().exec()
+		AddStudentDialog().exec()
 
 	def search_dialog(self):
 		SearchDialog().exec()
@@ -180,7 +180,7 @@ class EditDialog(QDialog):
 		contact = self.contact_input.text()
 		student_id = self.student_id
 
-		with connect_to_database("database.db") as connection:
+		with connect_to_database() as connection:
 			cursor = connection.cursor()
 			cursor.execute("UPDATE students SET name = ?, course = ?, mobile = ? WHERE id = ?",
 					   (name, course, contact, student_id))
@@ -215,7 +215,7 @@ class DeleteDialog(QDialog):
 
 
 	def delete_student(self):
-		with connect_to_database("database.db") as connection:
+		with connect_to_database() as connection:
 			cursor = connection.cursor()
 			cursor.execute("DELETE FROM students WHERE id = ?", (self.student_id, ))
 			connection.commit()
@@ -254,7 +254,7 @@ class SearchDialog(QDialog):
 		self.setLayout(grid)
 
 
-class InsertDialog(QDialog):
+class AddStudentDialog(QDialog):
 	def __init__(self):
 		super().__init__()
 		self.setWindowTitle("Add Student")
@@ -293,7 +293,7 @@ class InsertDialog(QDialog):
 
 
 	def register_student(self):
-		with connect_to_database("database.db") as connection:
+		with connect_to_database() as connection:
 			name = self.name_input.text().title()
 			course = self.course_input.itemText(self.course_input.currentIndex())
 			contact = self.contact_input.text()
